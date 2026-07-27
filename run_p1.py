@@ -33,7 +33,7 @@ def main():
     print(f"① 네이버 수집: {len(listings)}건")
 
     filt = apply_area_filter(listings, cfg)
-    print(f"② 30평대 & 디딤돌 필터: {len(filt)}건")
+    print(f"② 전용 {f['area_exclusive_max_m2']}㎡ 이하 필터: {len(filt)}건")
 
     # 통근시간 (단지별 1회 지오코딩 캐시 — 지역 인식)
     def region_str(l):
@@ -105,7 +105,7 @@ def main():
     reps = sorted(reps.values(), key=pref, reverse=True)[:60]   # 저평가 상위 단지만 보강
     print(f"⑥ 단지 다양성(단지당 1) → 보강 대상 {len(reps)}개 단지")
 
-    # 육아·상권 enrich + 4축 점수화
+    # 상권 enrich + 3축 점수화(가격·통근·상권)
     weights = cfg["scoring"]["weights"]
     for l in reps:
         l.update(amenity.enrich(l["lng"], l["lat"]))
@@ -119,12 +119,10 @@ def main():
         b = l["score_breakdown"]
         uv, jr = l.get("undervalue_pct"), l.get("jeonse_ratio")
         metric = f"저평가{uv:+.0f}%" if uv is not None else (f"전세가율{jr:.0f}%" if jr is not None else "-")
-        ns = l.get("nearest_school")
-        school = f"{ns['name']}({ns['dist_m']}m)" if ns else "-"
         flag = "올수리" if tag_renovated(l) else ""
         print(f"#{i:>2} {l['score_total']:>4}점 · {l['complex_name']}({l.get('build_year','?')}) {l['gu']} · "
               f"{l['trade_type']} {l['price_manwon']}만 {metric} · 🚗{l['commute_min']}분 · "
-              f"🧸{l.get('daycare',0)} 🏫{school} · [가{b['price']}/통{b['commute']}/육{b['childcare']}/상{b['amenity']}] {flag}")
+              f"[가{b['price']}/통{b['commute']}/상{b['amenity']}] {flag}")
 
     today = date.today().isoformat()
     docs_dir = os.path.join(os.path.dirname(__file__), "docs")

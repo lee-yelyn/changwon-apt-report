@@ -100,7 +100,7 @@ def _map(i, l):
     markers = html.escape(json.dumps(l.get("markers", []), ensure_ascii=False))
     name = html.escape(l["complex_name"])
     klink = f"https://map.kakao.com/link/map/{name},{lat},{lng}"
-    return (f"<h4 class='mt'>주변 육아 인프라 · 지도</h4>"
+    return (f"<h4 class='mt'>주변 인프라 · 지도</h4>"
             f"<div class='map' id='map{i}' data-lat='{lat}' data-lng='{lng}' data-markers=\"{markers}\">"
             f"<a class='mapfb' href='{klink}' target='_blank'>🗺️ 카카오맵에서 보기</a></div>")
 
@@ -108,8 +108,8 @@ def _map(i, l):
 def _infra(l):
     ns = l.get("nearest_school")
     school = f"{html.escape(ns['name'])} {ns['dist_m']}m" if ns else "-"
-    return (f"<div class='infra'>🏫 <b>{school}</b> · 🧸 어린이집 <b>{l.get('daycare',0)}</b> · "
-            f"🛒 마트 <b>{l.get('mart',0)}</b> · 🏥 병원 <b>{l.get('hospital',0)}</b></div>")
+    return (f"<div class='infra'>🛒 마트 <b>{l.get('mart',0)}</b> · 🏥 병원 <b>{l.get('hospital',0)}</b> · "
+            f"🏫 <b>{school}</b> · 🧸 어린이집 <b>{l.get('daycare',0)}</b></div>")
 
 
 def _reviews(l, has_naver):
@@ -157,8 +157,8 @@ def _card(i, l, meta):
       <div class="price"><span class="p">{l.get('trade_type','')} {fmt_price(l.get('price_manwon'))}</span>{_metric(l)}</div>
       <div class="ana">실거래 중위 {fmt_price(l.get('fair'))}</div>
       <div class="scores">{_bar('가격', b.get('price',0))}{_bar('통근', b.get('commute',0))}
-        {_bar('육아', b.get('childcare',0))}{_bar('상권', b.get('amenity',0))}</div>
-      <div class="facts">🚗 통근 <b>{l.get('commute_min','?')}분</b> · {sline} · 🧸 어린이집 <b>{l.get('daycare',0)}</b></div>
+        {_bar('상권', b.get('amenity',0))}</div>
+      <div class="facts">🚗 통근 <b>{l.get('commute_min','?')}분</b> · 🛒 마트 <b>{l.get('mart',0)}</b> · 🏥 병원 <b>{l.get('hospital',0)}</b> · {sline}</div>
       <div class="actions"><a class="btn btn-pri" href="{naver}" target="_blank">네이버 매물</a>
         <a class="btn btn-text" id="tgl{i}" onclick="toggle({i})">상세 ▼</a></div>
       {detail}

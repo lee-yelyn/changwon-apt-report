@@ -6,20 +6,18 @@ workplace:
   lat: 35.1981
 
 filters:
-  trade_types: [매매, 전세]
-  max_price_manwon: 30000        # 3억 (만원)
+  trade_types: [매매]              # 매매만 (전세 제외)
+  max_price_manwon: 40000        # 4억 (만원)
   max_commute_min: 30
-  area_exclusive_max_m2: 85      # 디딤돌 면적요건(전용)
-  supply_pyeong_min: 30          # 30평대(공급)
-  supply_pyeong_max: 39
+  area_exclusive_max_m2: 85      # 전용 85㎡ 이하
   build_year_exclude_before: 1991  # 35년 초과 제외 (2026 기준)
   old_renovate_year: 2001          # 25년 이상(이 연도 이하)은 올수리 or 저평가'상'만
   undervalue_high_pct: 10          # 저평가 '상' 기준(%) — 배지·대시보드용
   old_unreno_undervalue: 20        # 25년+ '비수리' 구축은 저평가 ≥20%(가격메리트 매우 큼)일 때만 후보
 
 scoring:
-  # 가격은 예산(3억) 안이면 충분 → 최소화. 통근·육아 최우선, 상권 보조.
-  weights: { price: 10, commute: 35, childcare: 35, amenity: 20 }
+  # 3축 — 가격 최우선(30), 통근·상권 보조(각 20). 합계로 자동 정규화됨.
+  weights: { price: 30, commute: 20, amenity: 20 }
 
 diversity:
   per_complex_max: 1
@@ -29,10 +27,6 @@ diversity:
 regions_gu:
   - { name: 성산구,     cortarNo: "4812300000", lawd: "48123" }
   - { name: 의창구,     cortarNo: "4812100000", lawd: "48121" }
-  - { name: 진해구,     cortarNo: "4812900000", lawd: "48129" }
-  - { name: 마산회원구, cortarNo: "4812700000", lawd: "48127" }
-  - { name: 마산합포구, cortarNo: "4812500000", lawd: "48125" }
-  - { name: 김해시,     cortarNo: "4825000000", lawd: "48250" }
 commute_radius_km: 18   # 동 중심~직장 직선거리 사전필터(러시보정 고려해 약간 넓힘)
 
 # 러시아워 보정: 통근분 = 출퇴근 양방향평균 × (1 + 평균×per_min)
@@ -41,8 +35,8 @@ rush:
   per_min: 0.05
 
 molit:
-  # 국토부 LAWD_CD(법정동 5자리): 성산·의창·진해·마산회원·마산합포·김해
-  lawd_codes: ["48123", "48121", "48129", "48127", "48125", "48250"]
+  # 국토부 LAWD_CD(법정동 5자리): 성산·의창
+  lawd_codes: ["48123", "48121"]
 
 # GitHub Pages 공개 리포트 URL (카카오톡 '전체 리포트 보기' 링크)
 report_url: "https://nuuuuuu.github.io/changwon-apt-report/"

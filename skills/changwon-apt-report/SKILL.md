@@ -2,8 +2,8 @@
 name: changwon-apt-report
 description: >
   창원 통근권 아파트 일일 리포트를 수집·분석·생성·발송한다. 네이버부동산 라이브 매물 →
-  통근(러시아워 보정)·면적(30평대·디딤돌)·연식 필터 → 국토부 실거래 저평가 + 카카오 육아·상권 →
-  4축 점수화로 Top10 → 애플 디자인 HTML(docs/) → 카카오톡 '나에게 보내기' → GitHub Pages.
+  통근(러시아워 보정)·면적(전용≤85㎡)·연식 필터 → 국토부 실거래 저평가 + 카카오 상권 →
+  3축 점수화로 Top10 → 애플 디자인 HTML(docs/) → 카카오톡 '나에게 보내기' → GitHub Pages.
   사용 시점(트리거): "창원 아파트 리포트 돌려줘", "오늘 매물 뽑아줘", "통근권 아파트 리포트",
   "부동산 리포트 생성", "아파트 추천 업데이트". English: run changwon apartment report,
   generate real-estate report, refresh apartment recommendations.
@@ -36,8 +36,8 @@ cd "<플러그인 경로>"
 
 ## 설정 (config.yaml — 코드 수정 없이 조정)
 - `workplace`: 직장 좌표(lng/lat) — 통근 기준점.
-- `filters`: 거래유형·가격상한·통근분·면적(30평대·디딤돌)·연식(35년 초과 제외 / 25년+ 올수리·저평가 규칙).
-- `scoring.weights`: 가격·통근·육아·상권 가중치.
+- `filters`: 거래유형(매매)·가격상한(4억)·통근분·면적(전용≤85㎡)·연식(35년 초과 제외 / 25년+ 올수리·저평가 규칙).
+- `scoring.weights`: 가격·통근·상권 가중치(각 30/20/20).
 - `rush.per_min`: 러시아워 통근 보정 계수(장거리일수록 ↑).
 - `regions_gu`: 통근권 시군구(cortarNo·lawd) — 동은 자동 확장 + 거리 사전필터.
 - `report_url`: 카톡에 넣을 GitHub Pages 주소.

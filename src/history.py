@@ -68,7 +68,6 @@ def update_watchlist(top, wl_path, today, high_pct=10):
                 "complex": key, "first_date": today, "last_seen": today, "last_date": today,
                 "first_price": price, "current_price": price, "days": 1, "status": "추적중",
                 "score": l.get("score_total", 0), "undervalue": uv, "commute": l.get("commute_min"),
-                "childcare": l.get("score_breakdown", {}).get("childcare"),
                 "trade_type": l.get("trade_type"), "area": l.get("area_excl"),
                 "url": l.get("url"),
             }

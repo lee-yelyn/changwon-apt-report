@@ -1,4 +1,4 @@
-"""4축 점수화: 가격/저평가 · 통근 · 육아 · 상권 (가중합 0~100)."""
+"""3축 점수화: 가격/저평가 · 통근 · 상권 (가중합 0~100)."""
 from __future__ import annotations
 
 
@@ -21,15 +21,6 @@ def commute_score(l):
     return _norm(30 - cm, 0, 25) if cm is not None else 0.0   # 5분↓=만점, 30분=0
 
 
-def childcare_score(l):
-    base = _norm(l.get("daycare", 0), 2, 35) * 0.5             # 어린이집/유치원 밀도(2~35)
-    ns = l.get("nearest_school")
-    if ns:
-        d = ns["dist_m"]
-        base += 50 if d <= 300 else (40 if d <= 600 else (25 if d <= 1000 else 10))  # 초등 근접
-    return round(min(100.0, base), 1)
-
-
 def amenity_score(l):
     return _norm(l.get("mart", 0) + l.get("hospital", 0), 3, 60)   # 마트+병원(3~60)
 
@@ -38,7 +29,6 @@ def score_listing(l, weights):
     parts = {
         "price": price_score(l),
         "commute": commute_score(l),
-        "childcare": childcare_score(l),
         "amenity": amenity_score(l),
     }
     total = sum(parts[k] * weights[k] for k in weights) / sum(weights.values())
