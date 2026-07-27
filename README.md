@@ -53,7 +53,7 @@ launchctl start com.neureup.changwonapt   # 수동 1회 테스트
 
 ## 🧩 Claude Code 플러그인으로 쓰기
 ```
-/plugin marketplace add https://github.com/NUUUUUU/changwon-apt-report
+/plugin marketplace add https://github.com/lee-yelyn/changwon-apt-report
 /plugin install changwon-apt-report@neureup-plugins
 ```
 설치 후 "창원 아파트 리포트 돌려줘" 라고 하면 Claude가 실행합니다. (`skills/changwon-apt-report/SKILL.md`)

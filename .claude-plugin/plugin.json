@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "창원 통근권 아파트 일일 리포트 자동화 — 네이버 라이브 매물 + 국토부 실거래 + 카카오(통근·육아·상권) 분석으로 Top10을 점수화해 애플 디자인 HTML 리포트 생성 → 카카오톡 '나에게 보내기' → GitHub Pages 발행.",
   "author": { "name": "이승환 (느릅)" },
-  "homepage": "https://github.com/NUUUUUU/changwon-apt-report",
-  "repository": "https://github.com/NUUUUUU/changwon-apt-report",
+  "homepage": "https://github.com/lee-yelyn/changwon-apt-report",
+  "repository": "https://github.com/lee-yelyn/changwon-apt-report",
   "license": "MIT",
   "keywords": [
     "real-estate", "apartment", "changwon", "korea",
