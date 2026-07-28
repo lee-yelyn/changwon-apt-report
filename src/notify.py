@@ -37,7 +37,7 @@ def send_to_me(text, link_url=None, button_title="매물 보기"):
     fallback = link_url or "https://m.land.naver.com"
     tmpl = {
         "object_type": "text",
-        "text": text[:200],
+        "text": text[:1000],          # 카카오 텍스트 템플릿 — 200자 초과 허용됨
         "link": {"web_url": fallback, "mobile_web_url": fallback},
     }
     if link_url:
@@ -79,14 +79,43 @@ def send_listings(top, report_url, meta, n=5):
     return r.status_code, r.json()
 
 
-def build_summary(top, meta):
-    # 날짜 → 요약(Top5) 순. 링크는 send_to_me의 버튼으로 맨 아래 붙음.
+def build_summary(top, meta, n=5):
+    """요약 + 추천매물(금액·통근·저평가) + 페이지 링크. 200자 제한 없음."""
     wd = "월화수목금토일"[date.fromisoformat(meta["date"]).weekday()]
-    lines = [f"📅 {meta['date'].replace('-', '.')} ({wd})", "🏠 창원 통근권 아파트 Top5"]
-    for i, l in enumerate(top[:5], 1):
+    lines = [f"📅 {meta['date'].replace('-', '.')} ({wd}) · 창원 통근권 아파트 리포트"]
+
+    # 요약
+    summ = f"🔎 오늘 {meta.get('n_final', '?')}건 분석"
+    extra = []
+    if meta.get("n_under_high"):
+        extra.append(f"저평가 上 {meta['n_under_high']}건")
+    if meta.get("n_new"):
+        extra.append(f"신규 {meta['n_new']}건")
+    if meta.get("n_drop"):
+        extra.append(f"인하 {meta['n_drop']}건")
+    if extra:
+        summ += " · " + " · ".join(extra)
+    lines.append(summ)
+
+    # 추천 매물
+    lines.append(f"\n🏆 추천 Top{min(n, len(top))}")
+    for i, l in enumerate(top[:n], 1):
         uv, jr = l.get("undervalue_pct"), l.get("jeonse_ratio")
         m = f"저평가{uv:+.0f}%" if uv is not None else (f"전세{jr:.0f}%" if jr else "")
-        lines.append(f"{i}. {l['complex_name']} {_fmt_price(l['price_manwon'])}·{l['commute_min']:.0f}분·{m}")
+        by = l.get("build_year")
+        seg = [f"{l.get('trade_type', '')} {_fmt_price(l['price_manwon'])}",
+               f"🚗{l['commute_min']:.0f}분"]
+        if m:
+            seg.append(m)
+        if isinstance(by, int):
+            seg.append(f"{by}년")
+        lines.append(f"{i}. {l['complex_name']} ({l.get('gu', '')})")
+        lines.append(f"   {' · '.join(seg)}")
+
+    # 페이지 링크
+    url = meta.get("report_url")
+    if url:
+        lines.append(f"\n👉 전체 리포트(상세·지도·후기): {url}")
     return "\n".join(lines)
 
 

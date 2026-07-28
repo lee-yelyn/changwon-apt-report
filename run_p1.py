@@ -154,6 +154,7 @@ def main():
         "date": today, "workplace": w["name"], "n_final": len(final), "n_top": len(top),
         "n_under_high": sum(1 for l in reps if (l.get("undervalue_pct") or 0) >= f["undervalue_high_pct"]),
         "n_new": n_new, "n_drop": n_drop,
+        "report_url": cfg.get("report_url", ""),
         "kakao_js_key": os.environ.get("KAKAO_JS_KEY", ""),
         "has_naver": bool(os.environ.get("NAVER_CLIENT_ID")),
     }
@@ -162,14 +163,11 @@ def main():
     shutil.copy(out, os.path.join(docs_dir, "index.html"))
     print(f"📄 리포트 생성 완료: docs/{today}.html  (+ index.html)")
 
-    # ⑩ 카카오톡 '나에게 보내기' (Top5 — 매물별 개별 링크 리스트)
+    # ⑩ 카카오톡 '나에게 보내기' (요약 + 추천매물·금액 + 페이지 링크 텍스트)
     try:
         report_link = cfg.get("report_url") or (top[0]["url"] if top else None)
-        code, resp = notify.send_listings(top, report_link, meta, n=5)
-        if code != 200:      # 리스트 템플릿 거부 시 텍스트 요약으로 폴백
-            print(f"⚠️ 리스트 발송 실패({code}: {resp}) → 텍스트 요약으로 재시도")
-            summary = notify.build_summary(top, meta)
-            code, _ = notify.send_to_me(summary, link_url=report_link, button_title="전체 리포트 보기")
+        summary = notify.build_summary(top, meta, n=5)
+        code, resp = notify.send_to_me(summary, link_url=report_link, button_title="전체 리포트 보기")
         print(f"📨 카카오톡 발송: {code}")
     except Exception as e:
         print(f"⚠️ 카카오톡 발송 실패: {e}")
