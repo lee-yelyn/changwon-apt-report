@@ -40,16 +40,22 @@ def main():
         g = l.get("gu", "")
         return f"창원시 {g}" if g.endswith("구") else g
     coord_cache = {}
+    commute_cache = {}     # 통근시간도 단지별 1회만 계산(같은 단지=동일 통근) → 길찾기 API 호출 대폭 절감
     enriched = []
     for l in filt:
         key = (l["complex_name"], l.get("gu"))
         if key not in coord_cache:
             q = f"{l['complex_name']} {region_str(l)} {l.get('dong', '')}".strip()
             coord_cache[key] = geocode(q)
-        if not coord_cache[key]:
+        coord = coord_cache[key]
+        if not coord:
             continue
-        l["lng"], l["lat"] = coord_cache[key]
-        l["commute_min"] = rush_commute(l["lng"], l["lat"], w["lng"], w["lat"], per_min)
+        l["lng"], l["lat"] = coord
+        if key not in commute_cache:
+            commute_cache[key] = rush_commute(coord[0], coord[1], w["lng"], w["lat"], per_min)
+            if len(commute_cache) % 25 == 0:
+                print(f"   …단지 {len(commute_cache)}곳 통근 계산 완료", flush=True)
+        l["commute_min"] = commute_cache[key]
         enriched.append(l)
     passed = [l for l in enriched if l["commute_min"] and l["commute_min"] <= f["max_commute_min"]]
     print(f"③ 통근 ≤{f['max_commute_min']}분: {len(passed)}건")
