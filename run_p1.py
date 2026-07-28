@@ -33,7 +33,7 @@ def main():
     print(f"① 네이버 수집: {len(listings)}건")
 
     filt = apply_area_filter(listings, cfg)
-    print(f"② 전용 {f['area_exclusive_max_m2']}㎡ 이하 필터: {len(filt)}건")
+    print(f"② 공급 {f['supply_pyeong_min']}~{f['supply_pyeong_max']}평 필터: {len(filt)}건")
 
     # 통근시간 (단지별 1회 지오코딩 캐시 — 지역 인식)
     def region_str(l):
@@ -128,7 +128,7 @@ def main():
         flag = "올수리" if tag_renovated(l) else ""
         print(f"#{i:>2} {l['score_total']:>4}점 · {l['complex_name']}({l.get('build_year','?')}) {l['gu']} · "
               f"{l['trade_type']} {l['price_manwon']}만 {metric} · 🚗{l['commute_min']}분 · "
-              f"[가{b['price']}/통{b['commute']}/상{b['amenity']}] {flag}")
+              f"[가{b['price']}/통{b['commute']}/상{b['amenity']}/육{b['childcare']}] {flag}")
 
     today = date.today().isoformat()
     docs_dir = os.path.join(os.path.dirname(__file__), "docs")
@@ -162,11 +162,14 @@ def main():
     shutil.copy(out, os.path.join(docs_dir, "index.html"))
     print(f"📄 리포트 생성 완료: docs/{today}.html  (+ index.html)")
 
-    # ⑩ 카카오톡 '나에게 보내기' (Top5 요약 + 1위 매물 링크)
+    # ⑩ 카카오톡 '나에게 보내기' (Top5 — 매물별 개별 링크 리스트)
     try:
-        summary = notify.build_summary(top, meta)
-        link = cfg.get("report_url") or (top[0]["url"] if top else None)
-        code, _ = notify.send_to_me(summary, link_url=link, button_title="전체 리포트 보기")
+        report_link = cfg.get("report_url") or (top[0]["url"] if top else None)
+        code, resp = notify.send_listings(top, report_link, meta, n=5)
+        if code != 200:      # 리스트 템플릿 거부 시 텍스트 요약으로 폴백
+            print(f"⚠️ 리스트 발송 실패({code}: {resp}) → 텍스트 요약으로 재시도")
+            summary = notify.build_summary(top, meta)
+            code, _ = notify.send_to_me(summary, link_url=report_link, button_title="전체 리포트 보기")
         print(f"📨 카카오톡 발송: {code}")
     except Exception as e:
         print(f"⚠️ 카카오톡 발송 실패: {e}")

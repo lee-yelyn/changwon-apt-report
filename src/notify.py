@@ -47,6 +47,38 @@ def send_to_me(text, link_url=None, button_title="매물 보기"):
     return r.status_code, r.json()
 
 
+def send_listings(top, report_url, meta, n=5):
+    """리스트 템플릿 — Top n 매물을 각각 개별 네이버 링크로 발송."""
+    token = get_access_token()
+    if not token:
+        raise RuntimeError("access_token 발급 실패 (refresh_token 확인)")
+    wd = "월화수목금토일"[date.fromisoformat(meta["date"]).weekday()]
+    rurl = report_url or "https://m.land.naver.com"
+    contents = []
+    for i, l in enumerate(top[:n], 1):
+        uv, jr = l.get("undervalue_pct"), l.get("jeonse_ratio")
+        m = f"저평가{uv:+.0f}%" if uv is not None else (f"전세{jr:.0f}%" if jr else "")
+        desc = " · ".join(filter(None, [
+            f"{l.get('gu','')}", f"🚗{l.get('commute_min','?')}분", m or None,
+        ]))
+        lurl = l.get("url") or rurl
+        contents.append({
+            "title": f"{i}. {l['complex_name']} {_fmt_price(l['price_manwon'])}",
+            "description": desc,
+            "link": {"web_url": lurl, "mobile_web_url": lurl},
+        })
+    tmpl = {
+        "object_type": "list",
+        "header_title": f"🏠 창원 통근권 아파트 Top{min(n, len(top))} ({meta['date'].replace('-', '.')} {wd})",
+        "header_link": {"web_url": rurl, "mobile_web_url": rurl},
+        "contents": contents,
+        "buttons": [{"title": "전체 리포트 보기", "link": {"web_url": rurl, "mobile_web_url": rurl}}],
+    }
+    r = requests.post(MEMO_URL, headers={"Authorization": f"Bearer {token}"},
+                      data={"template_object": json.dumps(tmpl, ensure_ascii=False)}, timeout=15)
+    return r.status_code, r.json()
+
+
 def build_summary(top, meta):
     # 날짜 → 요약(Top5) 순. 링크는 send_to_me의 버튼으로 맨 아래 붙음.
     wd = "월화수목금토일"[date.fromisoformat(meta["date"]).weekday()]

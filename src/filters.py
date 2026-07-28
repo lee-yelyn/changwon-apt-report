@@ -1,4 +1,4 @@
-"""하드 필터 — 면적(전용 상한), 가격, 연식(태그 기반 1차)."""
+"""하드 필터 — 면적(공급 평수 범위), 가격, 연식(태그 기반 1차)."""
 from __future__ import annotations
 
 PYEONG = 3.305785  # 1평 = 3.305785㎡
@@ -9,20 +9,23 @@ def m2_to_pyeong(m2: float) -> float:
 
 
 def apply_area_filter(listings, config):
-    """전용 ≤ 상한(85㎡)."""
+    """공급 평수 범위 필터 (기본 25~38평)."""
     f = config["filters"]
+    pmin = f["supply_pyeong_min"]
+    pmax = f["supply_pyeong_max"]
     out = []
     for l in listings:
         try:
-            a2 = float(l.get("area_excl"))      # 전용
+            a1 = float(l.get("area_supply"))    # 공급(㎡)
         except (TypeError, ValueError):
             continue
-        if a2 <= f["area_exclusive_max_m2"]:
-            a1 = l.get("area_supply")
+        supply_py = m2_to_pyeong(a1)
+        if pmin <= supply_py < pmax + 1:        # 25 ≤ 공급평 < 39 (25~38평대)
+            l["supply_pyeong"] = round(supply_py, 1)
             try:
-                l["supply_pyeong"] = round(m2_to_pyeong(float(a1)), 1)
+                l["excl_pyeong"] = round(m2_to_pyeong(float(l.get("area_excl"))), 1)
             except (TypeError, ValueError):
-                l["supply_pyeong"] = round(m2_to_pyeong(a2), 1)  # 공급 정보 없으면 전용 기준
+                l["excl_pyeong"] = None
             out.append(l)
     return out
 

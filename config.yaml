@@ -7,17 +7,18 @@ workplace:
 
 filters:
   trade_types: [매매]              # 매매만 (전세 제외)
-  max_price_manwon: 40000        # 4억 (만원)
+  max_price_manwon: 45000        # 4억5천 (만원)
   max_commute_min: 30
-  area_exclusive_max_m2: 85      # 전용 85㎡ 이하
+  supply_pyeong_min: 25            # 공급 25평 이상
+  supply_pyeong_max: 38            # 공급 38평 이하
   build_year_exclude_before: 1991  # 35년 초과 제외 (2026 기준)
   old_renovate_year: 2001          # 25년 이상(이 연도 이하)은 올수리 or 저평가'상'만
   undervalue_high_pct: 10          # 저평가 '상' 기준(%) — 배지·대시보드용
   old_unreno_undervalue: 20        # 25년+ '비수리' 구축은 저평가 ≥20%(가격메리트 매우 큼)일 때만 후보
 
 scoring:
-  # 3축 — 가격 최우선(30), 통근·상권 보조(각 20). 합계로 자동 정규화됨.
-  weights: { price: 30, commute: 20, amenity: 20 }
+  # 가격30·통근20·상권20·육아10 (합계로 자동 정규화). 주차는 별도 정책(아래) 참고.
+  weights: { price: 30, commute: 20, amenity: 20, childcare: 10 }
 
 diversity:
   per_complex_max: 1
