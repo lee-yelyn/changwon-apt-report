@@ -284,8 +284,9 @@ function toggle(i){var d=document.getElementById('detail'+i);var o=d.style.displ
 d.style.display=o?'none':'block';document.getElementById('tgl'+i).textContent=o?'상세 ▼':'접기 ▲';if(!o)initMap(i);}
 var _m={};function initMap(i){if(_m[i]||!window.kakao||!window.kakao.maps||!kakao.maps.Map)return;
 var el=document.getElementById('map'+i);if(!el)return;var lat=parseFloat(el.dataset.lat),lng=parseFloat(el.dataset.lng);
-if(isNaN(lat))return;var map=new kakao.maps.Map(el,{center:new kakao.maps.LatLng(lat,lng),level:4});
-new kakao.maps.Marker({map:map,position:new kakao.maps.LatLng(lat,lng)});
+if(isNaN(lat))return;var ctr=new kakao.maps.LatLng(lat,lng);var map=new kakao.maps.Map(el,{center:ctr,level:4});
+new kakao.maps.Marker({map:map,position:ctr});
+setTimeout(function(){map.relayout();map.setCenter(ctr);},60);
 try{JSON.parse(el.dataset.markers||'[]').forEach(function(p){var mk=new kakao.maps.Marker({map:map,position:new kakao.maps.LatLng(p.y,p.x)});
 var iw=new kakao.maps.InfoWindow({content:'<div style=\\'padding:3px 7px;font-size:11px\\'>'+p.name+'</div>'});
 kakao.maps.event.addListener(mk,'mouseover',function(){iw.open(map,mk)});kakao.maps.event.addListener(mk,'mouseout',function(){iw.close()});});}catch(e){}_m[i]=map;}
@@ -314,7 +315,7 @@ def generate(top, near_miss, watchlist, meta, out_path):
 <nav class="gnav"><b>창원 통근권 아파트 리포트</b><button class="listbtn" onclick="openSheet()">☰ 목록</button></nav>
 <div class="wrap">
   <section class="hero">
-    <div class="eyebrow">{html.escape(meta['workplace'])} 통근 30분권 · 매매·전세 ≤3억 · 30평대 · 디딤돌</div>
+    <div class="eyebrow">{html.escape(meta['workplace'])} 통근 30분권 · 매매 ≤4.5억 · 공급 25~38평</div>
     <h1>오늘의 추천<br>아파트 Top {meta['n_top']}</h1>
     <div class="stats">
       <div class="stat"><div class="n">{meta['n_final']}</div><div class="l">조건 통과</div></div>
@@ -333,7 +334,7 @@ def generate(top, near_miss, watchlist, meta, out_path):
 {sheet}
 <footer><b>출처</b> · 매물: 네이버부동산 / 실거래: 국토교통부 / 통근·지도·인프라: 카카오 / 후기: 네이버 검색.<br>
 <b>면책</b> · 공개 데이터 자동 분석 참고자료. 호가·매물은 변동·허위 가능. <b>반드시 현장확인·중개사 상담 후 판단하세요.</b> 가격·점수·디딤돌은 추정치.<br>
-생성 {meta['date']} · 창원 통근권(성산·의창·진해·마산·김해) 자동 분석.</footer>
+생성 {meta['date']} · 창원 통근권(성산·의창) 자동 분석.</footer>
 {sdk}
 <script>{JS}</script>
 </body></html>"""
