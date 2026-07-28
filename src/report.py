@@ -66,9 +66,14 @@ def _ddimdol(l):
     d = l.get("ddimdol")
     if not d:
         return ""
-    return (f"<div class='ddim'><b>디딤돌</b> 추정 · 대출 <b>{fmt_price(d['loan'])}</b>"
-            f"(LTV {d['ltv_pct']}%) · 필요현금 약 <b>{fmt_price(d['cash'])}</b>"
-            f"<div class='fine'>※ 가정치 · 한도·금리·본인 무주택/소득요건은 별도 확인</div></div>")
+    rows = (f"<div class='ddrow'>· <b>일반</b> 디딤돌 · 대출 <b>{fmt_price(d['loan'])}</b> "
+            f"(LTV {d['ltv_pct']}%) · 필요현금 약 <b>{fmt_price(d['cash'])}</b></div>")
+    if d.get("first_loan") is not None:
+        rows += (f"<div class='ddrow'>· <b>생애최초</b>(생애 첫 주택) · 대출 <b>{fmt_price(d['first_loan'])}</b> "
+                 f"(LTV {d['first_ltv_pct']}%) · 필요현금 약 <b>{fmt_price(d['first_cash'])}</b></div>")
+    return (f"<div class='ddim'><b>디딤돌 대출 추정</b>{rows}"
+            f"<div class='fine'>※ 가정치. 생애최초=무주택 세대의 생애 첫 주택구입(LTV·한도 우대). "
+            f"실제 한도·금리·소득/주택가격·무주택 요건은 조건별 상이 → 기금e든든 등에서 별도 확인.</div></div>")
 
 
 def _trend(l):
