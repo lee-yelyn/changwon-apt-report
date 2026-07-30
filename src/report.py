@@ -104,10 +104,17 @@ def _map(i, l):
     lat, lng = l.get("lat"), l.get("lng")
     markers = html.escape(json.dumps(l.get("markers", []), ensure_ascii=False))
     name = html.escape(l["complex_name"])
+    if lat is None or lng is None:
+        return ""
     klink = f"https://map.kakao.com/link/map/{name},{lat},{lng}"
+    nlink = f"https://map.naver.com/p/search/{name}"
+    # OpenStreetMap(Leaflet) 기반 — 키·도메인 등록 없이 누구에게나 바로 표시
     return (f"<h4 class='mt'>주변 인프라 · 지도</h4>"
-            f"<div class='map' id='map{i}' data-lat='{lat}' data-lng='{lng}' data-markers=\"{markers}\">"
-            f"<a class='mapfb' href='{klink}' target='_blank'>🗺️ 카카오맵에서 보기</a></div>")
+            f"<div class='map' id='map{i}' data-lat='{lat}' data-lng='{lng}' "
+            f"data-name=\"{name}\" data-markers=\"{markers}\"></div>"
+            f"<div class='fine' style='margin-top:6px'>"
+            f"<a href='{klink}' target='_blank'>🗺️ 카카오맵</a> · "
+            f"<a href='{nlink}' target='_blank'>네이버 지도</a>에서 열기</div>")
 
 
 def _infra(l):
@@ -264,7 +271,8 @@ body{font-family:var(--font);background:var(--parch);color:var(--ink);font-size:
 .detail h4{font-size:13.5px;font-weight:600;margin:0 0 8px}.detail h4.mt{margin-top:16px}
 table.trades{width:100%;border-collapse:collapse;font-size:12px}table.trades th,table.trades td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--div);color:var(--mut2)}table.trades th{color:var(--mut);font-weight:600}
 .ddim{background:var(--parch);border-radius:11px;padding:12px;font-size:12.5px;margin-top:9px;line-height:1.6}.ddim .fine{color:var(--mut);font-size:11px;margin-top:3px}.fine{color:var(--mut);font-size:11.5px}
-.map{position:relative;height:190px;border-radius:13px;overflow:hidden;border:1px solid var(--hair);background:repeating-linear-gradient(0deg,#eef0f3 0 33px,#e7eaee 33px 34px),repeating-linear-gradient(90deg,#eef0f3 0 33px,#e7eaee 33px 34px);display:flex;align-items:center;justify-content:center}
+.map{position:relative;height:220px;border-radius:13px;overflow:hidden;border:1px solid var(--hair);background:#eef0f3;z-index:0}
+.map .leaflet-control-attribution{font-size:9px}
 .mapfb{font-size:13px;color:var(--blue);background:rgba(255,255,255,.9);padding:8px 14px;border-radius:9999px;text-decoration:none;border:1px solid var(--hair)}
 .infra{font-size:12.5px;color:var(--mut2);margin-top:10px;line-height:1.7}.infra b{color:var(--ink);font-weight:600}
 .rev{border-top:1px solid var(--div);padding:9px 0 2px}.rtop{display:flex;gap:7px;align-items:center}.rtop b{font-size:12.5px}.rsrc{font-size:11px;color:var(--mut);margin-left:auto}.rq{font-size:12px;color:var(--mut2);margin-top:3px;line-height:1.5}.rq a{color:var(--blue)}
@@ -287,14 +295,20 @@ footer{max-width:560px;margin:24px auto 0;padding:22px 16px 50px;font-size:11.5p
 JS = """
 function toggle(i){var d=document.getElementById('detail'+i);var o=d.style.display==='block';
 d.style.display=o?'none':'block';document.getElementById('tgl'+i).textContent=o?'상세 ▼':'접기 ▲';if(!o)initMap(i);}
-var _m={};function initMap(i){if(_m[i]||!window.kakao||!window.kakao.maps||!kakao.maps.Map)return;
-var el=document.getElementById('map'+i);if(!el)return;var lat=parseFloat(el.dataset.lat),lng=parseFloat(el.dataset.lng);
-if(isNaN(lat))return;var ctr=new kakao.maps.LatLng(lat,lng);var map=new kakao.maps.Map(el,{center:ctr,level:4});
-new kakao.maps.Marker({map:map,position:ctr});
-setTimeout(function(){map.relayout();map.setCenter(ctr);},60);
-try{JSON.parse(el.dataset.markers||'[]').forEach(function(p){var mk=new kakao.maps.Marker({map:map,position:new kakao.maps.LatLng(p.y,p.x)});
-var iw=new kakao.maps.InfoWindow({content:'<div style=\\'padding:3px 7px;font-size:11px\\'>'+p.name+'</div>'});
-kakao.maps.event.addListener(mk,'mouseover',function(){iw.open(map,mk)});kakao.maps.event.addListener(mk,'mouseout',function(){iw.close()});});}catch(e){}_m[i]=map;}
+var _m={};
+function initMap(i){
+  if(_m[i]||!window.L)return;
+  var el=document.getElementById('map'+i);if(!el)return;
+  var lat=parseFloat(el.dataset.lat),lng=parseFloat(el.dataset.lng);if(isNaN(lat))return;
+  var map=L.map(el,{scrollWheelZoom:false}).setView([lat,lng],15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+  L.marker([lat,lng]).addTo(map).bindPopup(el.dataset.name||'단지');
+  try{JSON.parse(el.dataset.markers||'[]').forEach(function(p){
+    L.circleMarker([p.y,p.x],{radius:5,color:'#2b6cff',fillColor:'#2b6cff',fillOpacity:.8,weight:1}).addTo(map).bindPopup(p.name);
+  });}catch(e){}
+  setTimeout(function(){map.invalidateSize();map.setView([lat,lng],15);},80);
+  _m[i]=map;
+}
 function openSheet(){document.getElementById('sheet').classList.add('open');document.getElementById('sheetbg').classList.add('open');}
 function closeSheet(){document.getElementById('sheet').classList.remove('open');document.getElementById('sheetbg').classList.remove('open');}
 """
@@ -309,13 +323,13 @@ def generate(top, near_miss, watchlist, meta, out_path):
         nm_section = f"<div class='sec'>🔶 차선 (근접) 매물</div><div class='hint'>통근만 소폭 완화 · 돈·디딤돌·연식 유지</div>{nmc}"
     board = _board(watchlist)
     sheet = _sheet(out_dir, meta)
-    js_key = meta.get("kakao_js_key", "")
-    sdk = (f'<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={js_key}&autoload=false"></script>'
-           '<script>if(window.kakao&&kakao.maps){kakao.maps.load(function(){});}</script>') if js_key else ""
+    # 지도: OpenStreetMap(Leaflet) — 키·도메인 등록 불필요, 모든 방문자에게 표시
+    sdk = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>'
     doc = f"""<!DOCTYPE html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>창원 통근권 아파트 리포트 · {meta['date']}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>{CSS}</style></head><body>
 <nav class="gnav"><b>창원 통근권 아파트 리포트</b><button class="listbtn" onclick="openSheet()">☰ 목록</button></nav>
 <div class="wrap">
