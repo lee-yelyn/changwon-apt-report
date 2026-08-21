@@ -1,4 +1,4 @@
-"""점수화: 가격/저평가 · 통근 · 상권 · 육아 (가중합 0~100)."""
+"""점수화: 가격(저평가·재건축·상승여력) · 통근 · 상권 · 육아 (가중합 0~100)."""
 from __future__ import annotations
 
 
@@ -9,16 +9,33 @@ def _norm(v, lo, hi):
 
 
 def price_score(l):
+    """가격 메리트 + 재건축 가능성 + 집값 상승세를 합산."""
+    # 1) 기본: 저평가(실거래 대비 싸게 = 상승여력)
     if l.get("undervalue_pct") is not None:        # 매매: 실거래 대비 저평가
-        return _norm(l["undervalue_pct"], -5, 25)
-    if l.get("jeonse_ratio") is not None:          # 전세: 전세가율 낮을수록↑
-        return _norm(95 - l["jeonse_ratio"], 0, 35)
-    return 45.0                                     # 실거래 매칭 없음 → 중립
+        base = _norm(l["undervalue_pct"], -5, 25)
+    elif l.get("jeonse_ratio") is not None:        # 전세: 전세가율 낮을수록↑
+        base = _norm(95 - l["jeonse_ratio"], 0, 35)
+    else:
+        base = 45.0                                 # 실거래 매칭 없음 → 중립
+    # 2) 재건축 가능성: 구축일수록 가점(오래될수록 재건축 기대)
+    by = l.get("build_year")
+    if isinstance(by, int):
+        if by <= 1990:
+            base += 22                              # 재건축 유력(35년 안팎 구축)
+        elif by <= 2000:
+            base += 12                              # 노후 진행(재건축 여지)
+    # 3) 집값 상승 모멘텀: 최근 6개월 실거래 중위 상승
+    t = l.get("trend") or []
+    if len(t) >= 2:
+        first, last = t[0].get("median"), t[-1].get("median")
+        if first and last and last > first:
+            base += 12                              # 상승세
+    return round(min(100.0, base), 1)
 
 
 def commute_score(l):
     cm = l.get("commute_min")
-    return _norm(30 - cm, 0, 25) if cm is not None else 0.0   # 5분↓=만점, 30분=0
+    return _norm(40 - cm, 0, 35) if cm is not None else 0.0   # 5분↓=만점, 40분=0
 
 
 def childcare_score(l):

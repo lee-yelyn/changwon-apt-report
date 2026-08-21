@@ -7,18 +7,18 @@ workplace:
 
 filters:
   trade_types: [매매]              # 매매만 (전세 제외)
-  max_price_manwon: 45000        # 4억5천 (만원)
-  max_commute_min: 30
+  max_price_manwon: 50000        # 5억 (만원)
+  max_commute_min: 40
   supply_pyeong_min: 25            # 공급 25평 이상
   supply_pyeong_max: 38            # 공급 38평 이하
-  build_year_exclude_before: 1991  # 35년 초과 제외 (2026 기준)
-  old_renovate_year: 2001          # 25년 이상(이 연도 이하)은 올수리 or 저평가'상'만
+  build_year_exclude_before: 1980  # 1980년 이전 제외
+  old_renovate_year: 1980          # 구축 비수리 페널티 사실상 해제(재건축 후보 허용) — 점수로 우대
   undervalue_high_pct: 10          # 저평가 '상' 기준(%) — 배지·대시보드용
-  old_unreno_undervalue: 20        # 25년+ '비수리' 구축은 저평가 ≥20%(가격메리트 매우 큼)일 때만 후보
+  old_unreno_undervalue: 20        # (미사용 상태) 구축 비수리 저평가 요건
 
 scoring:
-  # 가격30·통근20·상권20·육아10 (합계로 자동 정규화). 주차는 별도 정책(아래) 참고.
-  weights: { price: 30, commute: 20, amenity: 20, childcare: 10 }
+  # 가격30(재건축·상승여력 포함)·통근20·상권30·육아20 (합계로 자동 정규화)
+  weights: { price: 30, commute: 20, amenity: 30, childcare: 20 }
 
 diversity:
   per_complex_max: 1
@@ -28,7 +28,7 @@ diversity:
 regions_gu:
   - { name: 성산구,     cortarNo: "4812300000", lawd: "48123" }
   - { name: 의창구,     cortarNo: "4812100000", lawd: "48121" }
-commute_radius_km: 18   # 동 중심~직장 직선거리 사전필터(러시보정 고려해 약간 넓힘)
+commute_radius_km: 25   # 동 중심~직장 직선거리 사전필터(통근 40분 대응해 넓힘)
 
 # 러시아워 보정: 통근분 = 출퇴근 양방향평균 × (1 + 평균×per_min)
 # 장거리(김해 등)일수록 가중 ↑ → 러시아워 30분 초과는 자동 필터링됨
