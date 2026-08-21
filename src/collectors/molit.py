@@ -48,7 +48,7 @@ def fetch_month(lawd: str, ym: str):
             "apt": g("aptNm"), "area": area, "amount": amount,
             "build_year": int(g("buildYear") or 0),
             "date": f"{g('dealYear')}.{int(g('dealMonth') or 0):02d}.{int(g('dealDay') or 0):02d}",
-            "floor": g("floor"),
+            "floor": g("floor"), "dong": g("umdNm"),   # 법정동(동 기반 보조매칭용)
         })
     return items
 
@@ -71,10 +71,12 @@ def build_index(trades):
         k = _norm(t["apt"])
         if not k:
             continue
-        d = idx.setdefault(k, {"build_year": 0, "areas": {}})
+        d = idx.setdefault(k, {"build_year": 0, "areas": {}, "dong": ""})
         d["areas"].setdefault(round(t["area"]), []).append((t["amount"], t["date"]))
         if t["build_year"]:
             d["build_year"] = t["build_year"]
+        if t.get("dong"):
+            d["dong"] = t["dong"]
     return idx
 
 
@@ -100,6 +102,12 @@ def match(listing, indexes):
     else:                               # ② 부분일치는 짧은 이름 길이 ≥4자만(흔한 단명 오매칭 방지)
         cands = [k for k in idx if (k in nm or nm in k) and min(len(k), len(nm)) >= 4]
         key = max(cands, key=len) if cands else None
+    if not key:                         # ③ 동(洞) 기반 보조매칭 — 같은 법정동 안에서만 부분일치(짧은 이름 안전)
+        dong = _norm(listing.get("dong") or "")
+        if dong and len(nm) >= 2:
+            cands = [k for k, v in idx.items()
+                     if _norm(v.get("dong", "")) == dong and (k in nm or nm in k)]
+            key = max(cands, key=len) if cands else None
     if not key:
         return None
     d = idx[key]
