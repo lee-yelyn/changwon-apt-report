@@ -17,8 +17,8 @@ filters:
   old_unreno_undervalue: 20        # (미사용 상태) 구축 비수리 저평가 요건
 
 scoring:
-  # 가격30(재건축·상승여력 포함)·통근20·상권30·육아20 (합계로 자동 정규화)
-  weights: { price: 30, commute: 20, amenity: 30, childcare: 20 }
+  # 통근은 조건에서 제외(표시만). 가격30(재건축·상승여력)·상권30·육아20 (합계로 자동 정규화)
+  weights: { price: 30, amenity: 30, childcare: 20 }
 
 diversity:
   per_complex_max: 1

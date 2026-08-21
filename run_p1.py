@@ -57,8 +57,8 @@ def main():
                 print(f"   …단지 {len(commute_cache)}곳 통근 계산 완료", flush=True)
         l["commute_min"] = commute_cache[key]
         enriched.append(l)
-    passed = [l for l in enriched if l["commute_min"] and l["commute_min"] <= f["max_commute_min"]]
-    print(f"③ 통근 ≤{f['max_commute_min']}분: {len(passed)}건")
+    passed = enriched     # 통근은 조건에서 제외 — 좌표 확보된 전부 통과(통근분은 표시용으로만 보관)
+    print(f"③ 좌표 확보(통근은 조건 제외, 표시만): {len(passed)}건")
 
     # 국토부 실거래 → 저평가율·연식 (시군구별 인덱스 + 매칭 신뢰 검증)
     lawds = [g["lawd"] for g in cfg["regions_gu"]]
@@ -128,7 +128,7 @@ def main():
         flag = "올수리" if tag_renovated(l) else ""
         print(f"#{i:>2} {l['score_total']:>4}점 · {l['complex_name']}({l.get('build_year','?')}) {l['gu']} · "
               f"{l['trade_type']} {l['price_manwon']}만 {metric} · 🚗{l['commute_min']}분 · "
-              f"[가{b['price']}/통{b['commute']}/상{b['amenity']}/육{b['childcare']}] {flag}")
+              f"[가{b['price']}/상{b['amenity']}/육{b['childcare']}] {flag}")
 
     today = date.today().isoformat()
     docs_dir = os.path.join(os.path.dirname(__file__), "docs")

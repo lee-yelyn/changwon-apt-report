@@ -168,8 +168,8 @@ def _card(i, l, meta):
       <div class="meta">{html.escape(metaline)}</div>
       <div class="price"><span class="p">{l.get('trade_type','')} {fmt_price(l.get('price_manwon'))}</span>{_metric(l)}</div>
       <div class="ana">실거래 중위 {fmt_price(l.get('fair'))}</div>
-      <div class="scores">{_bar('가격', b.get('price',0))}{_bar('통근', b.get('commute',0))}
-        {_bar('상권', b.get('amenity',0))}{_bar('육아', b.get('childcare',0))}</div>
+      <div class="scores">{_bar('가격', b.get('price',0))}{_bar('상권', b.get('amenity',0))}
+        {_bar('육아', b.get('childcare',0))}</div>
       <div class="facts">🚗 통근 <b>{l.get('commute_min','?')}분</b> · 🛒 마트 <b>{l.get('mart',0)}</b> · 🏥 병원 <b>{l.get('hospital',0)}</b> · {sline} · 🧸 어린이집 <b>{l.get('daycare',0)}</b></div>
       <div class="actions"><a class="btn btn-pri" href="{naver}" target="_blank">네이버 매물</a>
         <a class="btn btn-text" id="tgl{i}" onclick="toggle({i})">상세 ▼</a></div>
@@ -334,7 +334,7 @@ def generate(top, near_miss, watchlist, meta, out_path):
 <nav class="gnav"><b>창원 통근권 아파트 리포트</b><button class="listbtn" onclick="openSheet()">☰ 목록</button></nav>
 <div class="wrap">
   <section class="hero">
-    <div class="eyebrow">{html.escape(meta['workplace'])} 통근 30분권 · 매매 ≤4.5억 · 공급 25~38평</div>
+    <div class="eyebrow">{html.escape(meta['workplace'])} 인근 · 매매 ≤5억 · 공급 25~38평 · 1980년 이후 (통근은 참고표시)</div>
     <h1>오늘의 추천<br>아파트 Top {meta['n_top']}</h1>
     <div class="stats">
       <div class="stat"><div class="n">{meta['n_final']}</div><div class="l">조건 통과</div></div>

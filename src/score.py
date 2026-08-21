@@ -54,7 +54,6 @@ def amenity_score(l):
 def score_listing(l, weights):
     parts = {
         "price": price_score(l),
-        "commute": commute_score(l),
         "amenity": amenity_score(l),
         "childcare": childcare_score(l),
     }
