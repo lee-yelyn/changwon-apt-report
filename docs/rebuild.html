@@ -7,6 +7,7 @@
 <meta property="og:title" content="창원 재건축 투자 참고 리포트">
 <meta property="og:description" content="창원(진해·북면 제외) 재건축 단지 사업성·진행단계·몸값·입지/학군·예상 분담금 비교">
 <meta property="og:type" content="website">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
     --bg:#f4f6fb; --card:#ffffff; --ink:#1a2233; --sub:#5b6472;
@@ -60,6 +61,11 @@
   footer a{color:var(--brand)}
   .src{font-size:11.5px;word-break:break-all}
   .up{color:var(--up);font-weight:700}
+  .minimap{height:150px;margin-top:10px;border-radius:10px;overflow:hidden;
+    border:1px solid var(--line);background:#e9edf3}
+  .minimap .leaflet-control-attribution{font-size:9px}
+  .maplink{display:inline-block;margin-top:6px;font-size:12px;color:var(--brand);text-decoration:none}
+  .maplink:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -329,5 +335,46 @@
   </footer>
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  // 순위 카드 제목 → 좌표(카카오 지오코딩). 각 순위 카드에 미니 지도를 붙인다.
+  var COORDS = {
+    "반림현대1차":        [35.238909, 128.676706],
+    "은아 (신월1구역)":    [35.226060, 128.687555],
+    "사파삼익 (사파1구역)": [35.218713, 128.694721],
+    "무학 (용호3구역)":    [35.235010, 128.678808],
+    "가음은아 (가음3구역)": [35.207300, 128.694641],
+    "일동 (용호2구역)":    [35.236193, 128.678803],
+    "롯데 (용호1구역)":    [35.214206, 128.701723],
+    "반림럭키":           [35.238792, 128.668926],
+    "청실 외 (가음2구역)":  [35.208479, 128.696170],
+    "덴소사원 외 (가음4구역)":[35.206922, 128.696176]
+  };
+  document.querySelectorAll('.rank .rc').forEach(function(rc){
+    var ttEl = rc.querySelector('.tt');
+    if(!ttEl) return;
+    var name = ttEl.textContent.trim();
+    var c = COORDS[name];
+    if(!c) return;
+    var body = rc.querySelector('.body');
+    var div = document.createElement('div');
+    div.className = 'minimap';
+    body.appendChild(div);
+    try {
+      var map = L.map(div, {zoomControl:false, scrollWheelZoom:false, dragging:false,
+        doubleClickZoom:false, boxZoom:false, keyboard:false, touchZoom:false, tap:false})
+        .setView(c, 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
+      L.marker(c).addTo(map).bindPopup(name);
+    } catch(e) {}
+    var a = document.createElement('a');
+    a.className = 'maplink';
+    a.href = 'https://map.kakao.com/link/map/' + encodeURIComponent(name) + ',' + c[0] + ',' + c[1];
+    a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = '🗺️ 카카오맵에서 위치 열기';
+    body.appendChild(a);
+  });
+</script>
 </body>
 </html>
