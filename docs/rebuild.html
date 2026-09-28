@@ -66,6 +66,15 @@
   .minimap .leaflet-control-attribution{font-size:9px}
   .maplink{display:inline-block;margin-top:6px;font-size:12px;color:var(--brand);text-decoration:none}
   .maplink:hover{text-decoration:underline}
+  .pricebox{margin-top:11px}
+  .pricebox .pt{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:5px}
+  table.price{width:100%;border-collapse:collapse;font-size:12px}
+  table.price th,table.price td{padding:5px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.price th{color:var(--sub);font-weight:600;font-size:11px;text-align:right}
+  table.price td.area,table.price th.area{text-align:left}
+  table.price td.latest{color:var(--up);font-weight:700}
+  table.price .nocol{color:#98a1b0}
+  .pricenote{font-size:10.5px;color:#98a1b0;margin-top:4px}
 </style>
 </head>
 <body>
@@ -74,7 +83,7 @@
   <header class="hero">
     <h1>🏗️ 창원 재건축 투자 참고 리포트</h1>
     <p>진해·북면 제외 · 성산구 핵심 단지 중심</p>
-    <p>기준: 사업성(돈) + 입지·학군 미래가치 &nbsp;|&nbsp; 업데이트 2026-09-22</p>
+    <p>기준: 사업성(돈) + 입지·학군 미래가치 &nbsp;|&nbsp; 업데이트 2026-09-28</p>
   </header>
 
   <div class="disc">
@@ -350,6 +359,26 @@
     "청실 외 (가음2구역)":  [35.208479, 128.696170],
     "덴소사원 외 (가음4구역)":[35.206922, 128.696176]
   };
+  var PRICES = {"반림현대1차": [{"area": "전용69㎡·27평", "latest": "4.55억", "date": "26.08", "range": "2.7억~4.7억", "n": 46}, {"area": "전용84㎡·33평", "latest": "5.5억", "date": "26.09", "range": "4.1억~5.5억", "n": 10}, {"area": "전용85㎡·33평", "latest": "5.4억", "date": "26.08", "range": "3.8억~5.6억", "n": 24}, {"area": "전용106㎡·41평", "latest": "6.5억", "date": "26.07", "range": "5.2억~6.5억", "n": 7}, {"area": "전용125㎡·48평", "latest": "5.55억", "date": "25.11", "range": "5.55억~5.97억", "n": 2}, {"area": "전용127㎡·49평", "latest": "5.9억", "date": "26.02", "range": "5.89억~6.3억", "n": 5}], "은아 (신월1구역)": [{"area": "전용60㎡·23평", "latest": "6억", "date": "26.09", "range": "4.95억~6억", "n": 24}, {"area": "전용74㎡·29평", "latest": "6.7억", "date": "26.09", "range": "5.99억~7억", "n": 21}, {"area": "전용80㎡·31평", "latest": "7.7억", "date": "26.08", "range": "6.28억~7.7억", "n": 9}, {"area": "전용84㎡·33평", "latest": "8.48억", "date": "26.09", "range": "7.6억~8.48억", "n": 11}, {"area": "전용85㎡·33평", "latest": "8.45억", "date": "26.08", "range": "6.97억~8.45억", "n": 33}, {"area": "전용112㎡·43평", "latest": "10.8억", "date": "26.07", "range": "9.4억~10.8억", "n": 10}], "사파삼익 (사파1구역)": [{"area": "전용40㎡·16평", "latest": "3.15억", "date": "26.07", "range": "2억~3.15억", "n": 10}, {"area": "전용50㎡·19평", "latest": "3.8억", "date": "26.07", "range": "2.9억~4.15억", "n": 17}, {"area": "전용60㎡·23평", "latest": "4.65억", "date": "26.08", "range": "3.75억~4.89억", "n": 20}, {"area": "전용69㎡·27평", "latest": "5.88억", "date": "26.09", "range": "4.9억~6억", "n": 9}, {"area": "전용80㎡·31평", "latest": "6.42억", "date": "26.08", "range": "5.2억~6.42억", "n": 4}], "무학 (용호3구역)": [{"area": "전용50㎡·19평", "latest": "3.9억", "date": "26.09", "range": "3.1억~4.2억", "n": 14}, {"area": "전용56㎡·22평", "latest": "5억", "date": "26.09", "range": "3.3억~5.1억", "n": 58}], "가음은아 (가음3구역)": [{"area": "전용50㎡·19평", "latest": "2.6억", "date": "26.09", "range": "2억~2.69억", "n": 56}], "청실 외 (가음2구역)": [{"area": "전용42㎡·16평", "latest": "2.3억", "date": "26.05", "range": "1.75억~2.3억", "n": 5}, {"area": "전용43㎡·17평", "latest": "1.89억", "date": "26.08", "range": "1.4억~2.17억", "n": 15}, {"area": "전용44㎡·17평", "latest": "2.95억", "date": "26.05", "range": "2.38억~2.95억", "n": 7}, {"area": "전용48㎡·19평", "latest": "2.01억", "date": "26.03", "range": "2.01억~2.01억", "n": 1}, {"area": "전용49㎡·19평", "latest": "2.58억", "date": "26.03", "range": "2.35억~2.58억", "n": 4}], "덴소사원 외 (가음4구역)": [], "일동 (용호2구역)": [{"area": "전용51㎡·20평", "latest": "3.95억", "date": "26.08", "range": "3.05억~4.07억", "n": 17}, {"area": "전용60㎡·23평", "latest": "4.47억", "date": "26.08", "range": "3.75억~4.7억", "n": 32}], "롯데 (용호1구역)": [{"area": "전용56㎡·22평", "latest": "6.25억", "date": "26.07", "range": "4.95억~6.25억", "n": 5}, {"area": "전용67㎡·26평", "latest": "7.25억", "date": "26.05", "range": "5.8억~7.25억", "n": 10}, {"area": "전용68㎡·26평", "latest": "7.47억", "date": "26.07", "range": "7.29억~7.47억", "n": 2}, {"area": "전용80㎡·31평", "latest": "8.5억", "date": "26.07", "range": "6.95억~8.8억", "n": 15}, {"area": "전용83㎡·32평", "latest": "8.4억", "date": "26.05", "range": "8.4억~8.4억", "n": 1}, {"area": "전용99㎡·38평", "latest": "8.65억", "date": "25.10", "range": "8.65억~8.65억", "n": 1}, {"area": "전용107㎡·41평", "latest": "11.2억", "date": "26.07", "range": "9.4억~11.2억", "n": 3}, {"area": "전용113㎡·44평", "latest": "11.5억", "date": "26.08", "range": "11.5억~11.5억", "n": 2}, {"area": "전용142㎡·55평", "latest": "13.45억", "date": "26.03", "range": "13.3억~14.12억", "n": 9}], "반림럭키": [{"area": "전용49㎡·19평", "latest": "2.54억", "date": "26.09", "range": "1.6억~2.6억", "n": 38}, {"area": "전용59㎡·23평", "latest": "2.98억", "date": "26.08", "range": "2.1억~3.07억", "n": 18}, {"area": "전용76㎡·29평", "latest": "3.9억", "date": "26.09", "range": "2.79억~4.1억", "n": 32}, {"area": "전용85㎡·33평", "latest": "4.05억", "date": "26.09", "range": "3.1억~4.6억", "n": 37}]};
+  function priceTable(name){
+    var rows = PRICES[name];
+    var box = document.createElement('div');
+    box.className = 'pricebox';
+    if(!rows || !rows.length){
+      box.innerHTML = '<div class="pt">평형별 실거래가</div><div class="pricenote">최근 12개월 국토부 실거래 없음</div>';
+      return box;
+    }
+    var html = '<div class="pt">평형별 실거래가 <span style="font-weight:400">(최근 12개월·국토부)</span></div>'
+      + '<table class="price"><thead><tr><th class="area">면적</th><th>최근 실거래</th><th>최저~최고(건)</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      html += '<tr><td class="area">'+r.area+'</td>'
+        + '<td class="latest">'+r.latest+' <span class="nocol" style="font-weight:400">('+r.date+')</span></td>'
+        + '<td>'+r.range+' <span class="nocol">'+r.n+'</span></td></tr>';
+    });
+    html += '</tbody></table><div class="pricenote">전용면적 기준·평은 공급 추정 · 매매 실거래</div>';
+    box.innerHTML = html;
+    return box;
+  }
   document.querySelectorAll('.rank .rc').forEach(function(rc){
     var ttEl = rc.querySelector('.tt');
     if(!ttEl) return;
@@ -374,6 +403,7 @@
     a.target = '_blank'; a.rel = 'noopener';
     a.textContent = '🗺️ 카카오맵에서 위치 열기';
     body.appendChild(a);
+    body.appendChild(priceTable(name));
   });
 </script>
 </body>
